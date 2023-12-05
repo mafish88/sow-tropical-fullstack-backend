@@ -16,6 +16,8 @@ await client.connect()
         .catch(err => {
             res.status(500).send({success: false, mesaage: err })
         })
+    
+
 
 }   
 function addPlant(req, res){
@@ -23,7 +25,7 @@ function addPlant(req, res){
     db.collection('plants').insertOne(newPlant)
         .then(() => {
            getAllPlants(req, res)
-            // res.status(201).send({ message: "Plant added", success: true })
+            res.status(201).send({ message: "Plant added", success: true })
         })
         .catch(err => {
             res.status(500).send({ success: false, message: err })
@@ -39,29 +41,16 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.get('/', (req, res) => {
-    res.send('Hello World');
-
-})
-
-app.get('/api', (req, res) => {
-    res.send('Hello API');
-})
-
-app.get('/api/users', (req, res) => {
-    res.send('Hello Users');
-
-})
-
-app.get('/plants', (req, res) => {
-    getAllPlants(req, res)
 
 
-})
-    app.post('/plants', (req, res) => {
-        addPlant(req, res)
-    })
 
+app.get('/plants',getAllPlants)
+
+
+
+app.post('/plants',addPlant)
+
+    
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
