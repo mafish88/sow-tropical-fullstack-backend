@@ -11,9 +11,11 @@ await client.connect()
 const db = client.db('SowTropical')
 function getAllPlants(req, res) {
     db.collection('plants').find({}).toArray()
+
         .then(plants => {
             res.send(plants)
-        })
+        }) 
+      
         .catch(err => {
             res.status(500).send({ success: false, mesaage: err })
         })
@@ -24,41 +26,40 @@ function addPlant(req, res) {
     db.collection('plants').insertOne(newPlant)
         .then(() => {
             getAllPlants(req, res)
-           res.status(201).send({ message: "Plant added", success : true })
         })
         .catch(err => {
             res.status(500).send({ success: false, message: err })
         })
 }
 
-async function updateFeed(req, res) {
-    const currentDate = new Date();
-    const combineData = { dateAdded: currentDate, name: req.body.name }
-    const id = new ObjectId(req.params.id)
-    db.collection('plants')
-        .findOneAndUpdate(
-            { _id: id },
-            { $push: { feed: combineData } }
-        )
-        .then(() => {
-            res.status(200).send({ message: 'Fertilizer added successfully', success: true });
-        })
-        .catch((err) => {
-            res.status(500).send({ message: 'Error adding fertilizer', success: false });
-        });
-}
+// async function updateFeed(req, res) {
+//     const currentDate = new Date();     // get current date
+//     const combineData = { dateAdded: currentDate, ...req.body}
+//     const id = new ObjectId(req.params.id)
+//     db.collection('plants')
+//         .findOneAndUpdate(
+//             { _id: id },
+//             { $push: combineData }
+//         )
+//         .then(() => {
+//             res.status(200).send({ message: 'Update plant', success: true });
+//         })
+//         .catch((err) => {
+//             res.status(500).send({ message: 'Error updating plant', success: false });
+//         });
+// }
 
 
 const PORT = process.env.PORT || 5001
 const app = express();
 
-app.use(cors());
-app.use(express.json());
+app.use(cors());    // this is so we can use cors to connect to the front end 
+app.use(express.json()); // this is so we can use req.body in our functions 
 
-app.get('/plants', getAllPlants)
+app.get('/plants', getAllPlants)  // this is the route for getting all the plants from the database and sending them to the front end
 
-app.post('/plants', addPlant)
-app.patch('/plants/:id', updateFeed)
+app.post('/plants', addPlant) // this is the route for adding a new plant to the database and updating the front end with a new plant
+//app.patch('/plants/:id', updateFeed)
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
